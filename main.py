@@ -4,16 +4,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-#  script 오류남
-# No 'Access-Control-Allow-Origin'_해결을 위해 추가 import가 필요함
+# No 'Access-Control-Allow-Origin'
 # CORS 설정
 app.add_middleware(
-    CORSMiddleware, 
+    CORSMiddleware,
     allow_origins=["*"],  # 실제 운영 환경에서는 접근 가능한 도메인만 허용하는 것이 좋습니다.
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Mount the 'resources' directory as '/images' endpoint
+from fastapi.staticfiles import StaticFiles
+app.mount("/images", StaticFiles(directory="resources"), name="images")
+# http://127.0.0.1:8000/images/thermometer.png
+# 
 
 @app.get("/")
 async def root():
@@ -23,6 +27,10 @@ import pickle
 
 # /api_v1/mlmodelwithregression with dict params
 # method : post
+# {
+#     "texture_mean": 18.5,
+#     "perimeter_mean": 102.1
+# }
 @app.post('/api_v1/mlmodelwithregression') 
 def mlmodelwithregression(data:dict) : # json
     print('data with dict {}'.format(data))
@@ -44,5 +52,3 @@ def mlmodelwithregression(data:dict) : # json
     # 예측값 리턴
     result = {'radius_mean':result_predict[0]}
     return result
-
-# {'texture_mean' :16.34,'perimeter_mean':87.21} body_raw_json
